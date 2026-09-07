@@ -1,6 +1,289 @@
 <!DOCTYPE html>
 <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Farming Gram</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#111827;
+  color:white;
+  min-height:100vh;
+}
+
+.app{
+  max-width:500px;
+  margin:auto;
+  padding:20px 15px 90px;
+}
+
+h1{
+  text-align:center;
+  margin:10px 0;
+}
+
+.subtitle{
+  text-align:center;
+  color:#9ca3af;
+  margin-bottom:20px;
+}
+
+.balance{
+  background:#1f2937;
+  border-radius:20px;
+  padding:25px;
+  text-align:center;
+  margin-bottom:18px;
+}
+
+.balance h2{
+  color:#fbbf24;
+  font-size:34px;
+  margin-top:10px;
+}
+
+.status{
+  color:#9ca3af;
+  margin-top:10px;
+}
+
+.mining-btn{
+  width:100%;
+  padding:18px;
+  border:none;
+  border-radius:15px;
+  background:#22c55e;
+  color:white;
+  font-size:18px;
+  font-weight:bold;
+  margin-bottom:20px;
+}
+
+.card{
+  background:#1f2937;
+  padding:18px;
+  border-radius:15px;
+  margin-bottom:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.card h3{
+  font-size:17px;
+}
+
+.card p{
+  color:#9ca3af;
+  font-size:13px;
+  margin-top:5px;
+}
+
+.go-btn{
+  border:none;
+  background:#3b82f6;
+  color:white;
+  padding:10px 15px;
+  border-radius:10px;
+}
+
+.nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  background:#1f2937;
+  display:flex;
+  justify-content:space-around;
+  padding:15px 5px;
+}
+
+.nav button{
+  background:none;
+  border:none;
+  color:white;
+  font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<h1>🌾 Farming Gram</h1>
+<p class="subtitle">Mine • Complete Tasks • Earn Rewards</p>
+
+<div class="balance">
+  <p>Your Balance</p>
+  <h2><span id="balance">0</span> GRAM</h2>
+  <p class="status" id="status">Mining stopped</p>
+</div>
+
+<button class="mining-btn" id="miningBtn" onclick="toggleMining()">
+⛏ START MINING
+</button>
+
+<div class="card">
+  <div>
+    <h3>🎁 Daily Bonus</h3>
+    <p id="bonusText">Claim 10 GRAM every 24 hours</p>
+  </div>
+  <button class="go-btn" onclick="claimBonus()">Claim</button>
+</div>
+
+<div class="card">
+  <div>
+    <h3>📢 Join Channel</h3>
+    <p>Complete task and earn 20 GRAM</p>
+  </div>
+  <button class="go-btn" onclick="completeTask()">Task</button>
+</div>
+
+<div class="card">
+  <div>
+    <h3>👥 Invite Friends</h3>
+    <p>Invite friends and earn rewards</p>
+  </div>
+  <button class="go-btn" onclick="inviteFriend()">Invite</button>
+</div>
+
+<div class="card">
+  <div>
+    <h3>💰 Withdrawal</h3>
+    <p>Minimum withdrawal: 1000 GRAM</p>
+  </div>
+  <button class="go-btn" onclick="withdraw()">Withdraw</button>
+</div>
+
+</div>
+
+<div class="nav">
+<button>🏠 Home</button>
+<button>📋 Tasks</button>
+<button>👥 Friends</button>
+<button>👤 Profile</button>
+</div>
+
+<script>
+
+let balance = Number(localStorage.getItem("balance")) || 0;
+let mining = localStorage.getItem("mining") === "true";
+let lastBonus = Number(localStorage.getItem("lastBonus")) || 0;
+let taskCompleted = localStorage.getItem("taskCompleted") === "true";
+
+const balanceElement = document.getElementById("balance");
+const miningButton = document.getElementById("miningBtn");
+const statusElement = document.getElementById("status");
+
+function updateBalance(){
+  balanceElement.innerText = balance;
+  localStorage.setItem("balance", balance);
+}
+
+function updateMiningUI(){
+  if(mining){
+    miningButton.innerText = "⛏ MINING ACTIVE";
+    statusElement.innerText = "🟢 Mining is running";
+  }else{
+    miningButton.innerText = "⛏ START MINING";
+    statusElement.innerText = "Mining stopped";
+  }
+}
+
+function toggleMining(){
+  mining = !mining;
+  localStorage.setItem("mining", mining);
+  updateMiningUI();
+}
+
+setInterval(function(){
+  if(mining){
+    balance += 1;
+    updateBalance();
+  }
+}, 10000);
+
+function claimBonus(){
+
+  const now = Date.now();
+  const twentyFourHours = 24 * 60 * 60 * 1000;
+
+  if(now - lastBonus < twentyFourHours){
+    alert("❌ Daily bonus already claimed! Come back later.");
+    return;
+  }
+
+  balance += 10;
+  lastBonus = now;
+
+  localStorage.setItem("lastBonus", lastBonus);
+
+  updateBalance();
+
+  alert("🎉 You received 10 GRAM!");
+}
+
+function completeTask(){
+
+  if(taskCompleted){
+    alert("✅ Task already completed!");
+    return;
+  }
+
+  balance += 20;
+  taskCompleted = true;
+
+  localStorage.setItem("taskCompleted", "true");
+
+  updateBalance();
+
+  alert("🎉 Task completed! You earned 20 GRAM.");
+}
+
+function inviteFriend(){
+
+  const botLink = "https://t.me/";
+
+  if(navigator.share){
+    navigator.share({
+      title: "Farming Gram",
+      text: "Join Farming Gram and start earning!",
+      url: botLink
+    });
+  }else{
+    alert("Share link: " + botLink);
+  }
+}
+
+function withdraw(){
+
+  if(balance < 1000){
+    alert("❌ Minimum withdrawal is 1000 GRAM.");
+    return;
+  }
+
+  alert("💰 Withdrawal system will be connected next!");
+}
+
+updateBalance();
+updateMiningUI();
+
+</script>
+
+</body>
+</html><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
